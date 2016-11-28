@@ -1,4 +1,3 @@
-import multiprocessing
 import time
 from alchemyapi import AlchemyAPI
 import boto3
@@ -34,7 +33,6 @@ def worker(queue):
         else:
             time.sleep(1)
 if __name__ == '__main__':
-# pool = multiprocessing.Pool(10, worker_main, (queue,))
     worker(queue)
 while True:
     pass
