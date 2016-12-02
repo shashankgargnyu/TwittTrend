@@ -10,7 +10,7 @@ AWS: SQS, SNS, EBS
 
 Link: http://tweetygooglemap-dev.us-west-2.elasticbeanstalk.com
 
-This web app is an update to the twittmap app with tweets now indexed in real time and the counter shown for tweets for a particular keyword in real time.
+This web app is an update to the <a href='https://github.com/shashankgargnyu/twittmap'>twittmap</a> app with tweets now indexed in real time and the counter shown for tweets for a particular keyword in real time.
 
 What twittmap did?
 This web app is dedicated to displaying the location of keyword based tweets on Google map . 
