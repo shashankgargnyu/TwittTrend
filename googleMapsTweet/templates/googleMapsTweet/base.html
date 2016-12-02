@@ -37,7 +37,7 @@ h3 {
     
 
     <div id="nav"   >
-	
+	<h4>Tweet Count: <span id="tweetspan"> 0 </span><h4>
 	<h3 >Twitt Map</h3>
 	
 	    <form id="listform" method="POST">{% csrf_token %}
@@ -58,7 +58,7 @@ h3 {
         <button type="submit"  class="btn btn-primary" style="width:190px" onsubmit="initMap()">Submit</button>
 		</div>
         </form>
-		
+
     </div>
 	
     <div id="map">
@@ -66,13 +66,7 @@ h3 {
 	
 	</div>
     <script>
-	function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-}
 
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-}
         function initMap() {
             var uluru = {lat: 20, lng: -30};
             var map = new google.maps.Map(document.getElementById('map'), {
@@ -87,40 +81,96 @@ function closeNav() {
                 var selectedword = document.getElementById("ddlSearchWords");
             searchKeyword = selectedword.options[selectedword.selectedIndex].value;
             console.log(searchKeyword);
-                $.ajax({
-                    url: '/post/',
-                    type: 'POST',
-                    data: {Search: searchKeyword, csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()},
 
-                    success: function (json) {
-                        var map = new google.maps.Map(document.getElementById('map'), {
-                            zoom: 3,
-                            center: uluru
+
+
+var map = new google.maps.Map(document.getElementById('map'), {
+                                    zoom: 3,
+                                    center: uluru
+
+                                });
+
+                        $.ajax({
+                            url: '/post/',
+                            type: 'POST',
+                            data: {
+                                Search: searchKeyword,
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                            },
+
+                            success: function (json) {
+
+
+                                {#                        console.log(json);#}
+                                console.log(json.length);
+                                {#                        console.log(json.coordinates)#}
+
+                                for (i = 0; i < json.length.hits; i++) {
+                                    {#                            console.log(json.coordinates[i].lat);#}
+                                    {#                            console.log(json.coordinates[i].lng);#}
+                                    console.log(json.sentiment[i]);
+                                    var myLatlng = new google.maps.LatLng(parseFloat(json.coordinates[i].lat), parseFloat(json.coordinates[i].lng));
+                                    {#                            console.log(myLatlng);#}
+                                    if (json.sentiment[i]=="positive") {
+                                        var marker = new google.maps.Marker({
+                                            map: map,
+                                            animation: google.maps.Animation.DROP,
+                                            position: myLatlng,
+                                            title: json.tweet[i],
+                                            icon:'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+
+
+                                        })
+                                    }
+                                    if (json.sentiment[i]=="negative") {
+                                        var marker = new google.maps.Marker({
+                                            map: map,
+                                            animation: google.maps.Animation.DROP,
+                                            position: myLatlng,
+                                            title: json.tweet[i],
+                                            icon:'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+
+                                        })
+                                    }
+                                    if (json.sentiment[i]=="neutral") {
+                                        var marker = new google.maps.Marker({
+                                            map: map,
+                                            position: myLatlng,
+                                            animation: google.maps.Animation.DROP,
+                                            title: json.tweet[i],
+                                            icon:'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+
+                                        })
+                                    }
+
+                                }
+                                query();
+                                function query(){
+                            $.ajax({
+                            url: '/post/',
+                            type: 'GET',
+                            data: {
+                                Search: searchKeyword,
+                                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                            },
+
+                            success: function (json) {
+                                console.log(json);
+                                $("#tweetspan").text(json.hits);
+                            }
+                        });
+                setTimeout(query,1000)
+            }
+                            }
                         });
 
-                        console.log(json);
-                        console.log(json.length);
-                        console.log(json.coordinates)
-                        for(i=0; i<json.length.hits; i++){
-                            console.log(json.coordinates[i].lat);
-                            console.log(json.coordinates[i].lng);
-                            var myLatlng = new google.maps.LatLng(parseFloat(json.coordinates[i].lat),parseFloat(json.coordinates[i].lng));
-                            console.log(myLatlng);
 
-                            var marker = new google.maps.Marker({
-                                map: map,
-                                position: myLatlng
 
-                            })
-                        }
-
-                    }
-                });
             });
         }
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key='Enter Google API key here'&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key='Enter google maps key here'&callback=initMap">
     </script>
   </body>
 </html>

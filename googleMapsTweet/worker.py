@@ -5,9 +5,9 @@ import json
 
 sqs = boto3.resource('sqs')
 sns = boto3.client('sns')
-queue = sqs.get_queue_by_name(QueueName='tweetsIn')
+queue = sqs.get_queue_by_name(QueueName='Enter SQS queue name here')
 alchemiapi = AlchemyAPI()
-arn = 'arn:aws:sns:us-east-1:370645577623:twitterApp'
+arn = 'Enter SNS Topic arn herer'
 def worker(queue):
     while True:
         messages = queue.receive_messages(MessageAttributeNames=['Tweet', 'Latitude', 'Longitude'])
@@ -21,17 +21,16 @@ def worker(queue):
                     
                     try:
                         response = alchemiapi.sentiment('text',tweet)
-                        senti = response.get('docSentiment').get('type')
+                        sentiment = response.get('docSentiment').get('type')
                     except Exception as e:
-                        senti = "neutral"
+                        sentiment = "neutral"
                 
                     sns_message = {"tweet":tweet, "lat":lat, "lng": lng, "sentiment":senti}
                     print("SNS messsage: "+str(sns_message))
                     sns.publish(TargetArn=arn, Message=json.dumps({'default':json.dumps(sns_message)}))
                 
                 message.delete()
-        else:
-            time.sleep(1)
+        
 if __name__ == '__main__':
     worker(queue)
 while True:
